@@ -28,5 +28,5 @@ app.use("/api/profiles",profiles)
 
 
 app.listen(80,(req,res)=> {
-  console.log("服务器启动成功")
+  console.log("80服务器启动成功")
 })
