@@ -8,12 +8,17 @@ const passport =require("passport")
 
 const Profile= require("../../modules/profile")
 
+
+
+
+
+
 // 路由指向  公开接口 私有接口
 router.get("/test",(req,res)=> {
   res.json({mag:"profile"})
 })
 // 创建信息接口
-router.post("/add",(req,res)=> {
+router.post("/add", passport.authenticate("jwt", { session: false }),(req,res)=> {
   
   const profileFields = {};
 
@@ -32,7 +37,7 @@ router.post("/add",(req,res)=> {
 
 
 // 获取所有信息
-router.get("/",(req,res)=> {
+router.get("/",passport.authenticate("jwt", { session: false }),(req,res)=> {
   Profile.find().then(profile=> {
     if(!profile) {
       return res.status(404).json("没有任何内容")
@@ -44,7 +49,7 @@ router.get("/",(req,res)=> {
 
 
 //获取单个信息
-router.get("/:id",(req,res)=> {
+router.get("/:id",passport.authenticate("jwt", { session: false }),(req,res)=> {
   Profile.findOne({_id:req.params.id}).then(profile=> {
     if(!profile) {
       return res.status(404).json("没有任何内容")
@@ -56,7 +61,7 @@ router.get("/:id",(req,res)=> {
 })
 
 // 编辑信息接口
-router.post("/edit/:id",(req,res)=> {
+router.post("/edit/:id",passport.authenticate("jwt", { session: false }),(req,res)=> {
   
   const profileFields = {};
 
@@ -76,7 +81,7 @@ router.post("/edit/:id",(req,res)=> {
 );
                                                                
 // 删除信息接口
-router.delete("/delete/:id",(req,res)=> {
+router.delete("/delete/:id",passport.authenticate("jwt", { session: false }),(req,res)=> {
   Profile.findOneAndRemove({ _id: req.params.id })
       .then((profile) => {
         res.json(profile);

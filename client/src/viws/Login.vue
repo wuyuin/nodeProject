@@ -49,6 +49,8 @@
 </template>
 
 <script>
+//前端解析token
+import jwt_decode from "jwt-decode"
 export default {
   name: "Login",
   data () {
@@ -85,7 +87,8 @@ export default {
 
   },
   methods: {
-    submitForm (formName) {
+
+    /* submitForm (formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.$axios
@@ -95,7 +98,14 @@ export default {
               console.log(res)
               //token处理
               const { token } = res.data
+              //将服务器返回给客户端的token 存到localStorage里面
               localStorage.setItem("eleToken", token)
+              // 解析存到localStorage里的token
+              const decoded = jwt_decode(token)
+              // console.log(decoded)
+              // 将解析出来的token存到vuex中
+              this.$store.dispatch("setIsAutnenticated", !this.isEmpty(decoded))
+              this.$store.dispatch(" setUser", decoded)
               this.$router.push("/index")
 
             });
@@ -103,9 +113,44 @@ export default {
         }
       })
 
-    }
-  }
+    }, */
+
+    submitForm (formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          this.$axios.post("/api/users/login", this.loginUser).then(res => {
+            // 登录成功
+            const { token } = res.data;
+            localStorage.setItem("eleToken", token);
+
+            // 解析token
+            const decode = jwt_decode(token);
+
+            // 存储数据
+            this.$store.dispatch("setIsAutnenticated", !this.isEmpty(decode));
+            this.$store.dispatch("setUser", decode);
+
+            // 页面跳转
+            this.$router.push("/index");
+          });
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    isEmpty (value) {
+      return (
+        value === undefined ||
+        value === null ||
+        (typeof value === "object" && Object.keys(value).length === 0) ||
+        (typeof value === "string" && value.trim().length === 0)
+      );
+    },
+  },
+
 }
+
 </script>
 
 <style scoped>
